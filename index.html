@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Happy Birthday</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <canvas id="bg-canvas"></canvas>
+
+        <!-- Landing Screen -->
+        <div id="landing" class="screen active">
+            <div class="landing-content">
+                <h1>A birthday card for you</h1>
+                <button id="start-btn">Open my card</button>
+            </div>
+        </div>
+
+        <!-- Cake Screen -->
+        <div id="cake-screen" class="screen">
+            <div class="candle-glow"></div>
+            <h2 class="blow-text" id="blow-text">Make a wish &amp; blow out the candles!</h2>
+
+            <div class="cake-scene">
+                <div class="candle-slot" id="candle-0" style="left: 24%; bottom: 62%; transform: rotate(-4deg);">
+                    <img src="Candle.png" class="candle-img" alt="">
+                </div>
+                <div class="candle-slot" id="candle-1" style="left: 42%; bottom: 64%; transform: rotate(1deg);">
+                    <img src="Candle.png" class="candle-img" alt="">
+                </div>
+                <div class="candle-slot" id="candle-2" style="left: 57%; bottom: 62%; transform: rotate(3deg);">
+                    <img src="Candle.png" class="candle-img" alt="">
+                </div>
+                <img src="Candle.star.png" class="star-overlay" alt="">
+                <img src="Cake.base.png" class="cake-base-img" alt="Birthday Cake">
+            </div>
+
+            <div class="camera-area" id="camera-area">
+                <div class="camera-bubble" id="camera-bubble">
+                    <video id="camera-feed" autoplay playsinline muted></video>
+                </div>
+                <p class="camera-status" id="camera-status">Starting camera…</p>
+            </div>
+
+            <button id="tap-blow-btn" class="hidden">Tap to Blow</button>
+        </div>
+
+        <!-- Note Overlay -->
+        <div id="note-overlay" class="hidden">
+            <div class="note-card" id="note-card">
+                <div class="note-inner">
+                    <h3>Happy Birthday!</h3>
+
+                    <!-- ✏️ CUSTOMIZE YOUR MESSAGE BELOW ✏️ -->
+                    <p class="note-message">
+                        Wishing you the most wonderful birthday filled with
+                        joy, laughter, and all the things that make you happy.
+                        <br><br>
+                        Even though we're miles apart, know that I'm celebrating
+                        you today and every day. You deserve the world!
+                    </p>
+                    <p class="note-signature">With all my love</p>
+                    <!-- ✏️ END OF CUSTOM MESSAGE ✏️ -->
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Polaroid Overlay -->
+        <div id="polaroid-overlay" class="hidden">
+            <!-- CSS Polaroid Camera -->
+            <div class="pol-cam" id="pol-cam">
+                <div class="pol-cam-body">
+                    <div class="pol-cam-flash-unit">
+                        <div class="pol-cam-flash-bulb"></div>
+                    </div>
+                    <div class="pol-cam-top">
+                        <div class="pol-cam-finder"></div>
+                    </div>
+                    <div class="pol-cam-mid">
+                        <div class="pol-cam-lens">
+                            <div class="pol-cam-lens-ring">
+                                <div class="pol-cam-viewfinder" id="cam-viewfinder"></div>
+                            </div>
+                        </div>
+                        <div class="pol-cam-shutter"></div>
+                    </div>
+                    <div class="pol-cam-stripe"></div>
+                    <div class="pol-cam-bottom">
+                        <div class="pol-cam-slot"></div>
+                    </div>
+                </div>
+                <p class="pol-cam-text">Say cheese!</p>
+            </div>
+
+            <div class="countdown" id="countdown"></div>
+            <div class="polaroid-flash" id="polaroid-flash"></div>
+
+            <!-- Printed Polaroid Photo -->
+            <div class="polaroid-scene" id="polaroid-scene">
+                <div class="polaroid-frame" id="polaroid-frame">
+                    <div class="polaroid-photo">
+                        <canvas id="polaroid-canvas"></canvas>
+                        <div class="photo-grain"></div>
+                    </div>
+                    <p class="polaroid-caption">Happy Birthday!</p>
+                </div>
+                <div class="polaroid-actions">
+                    <button id="save-photo-btn">Save Photo</button>
+                    <button id="skip-photo-btn">Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="confetti-canvas"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <script src="app.js"></script>
+</body>
+</html>

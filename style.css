@@ -1,0 +1,794 @@
+/* ========================================
+   VIRTUAL BIRTHDAY CARD
+   ======================================== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Quicksand', 'Segoe UI', sans-serif;
+    background: #f5e6e0;
+    color: #333;
+}
+
+#app {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0 auto;
+    overflow: hidden;
+    background: url('background.jpeg') center / cover no-repeat;
+}
+
+/* ── Background Canvas (hidden — using background.jpeg instead) ── */
+#bg-canvas {
+    display: none;
+}
+
+/* ── Screens ── */
+.screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+    z-index: 1;
+}
+
+.screen.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ── Landing Screen ── */
+#landing {
+    background: transparent;
+}
+
+.landing-content {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 24px;
+    margin: 0 1.5rem;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.landing-content h1 {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    font-size: 1.5rem;
+    color: #3a2020;
+    margin-bottom: 2rem;
+    letter-spacing: 0.02em;
+}
+
+#start-btn {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 0.9rem 2.2rem;
+    border: none;
+    border-radius: 50px;
+    background: #e91e8c;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 12px rgba(233, 30, 140, 0.35);
+    letter-spacing: 0.03em;
+}
+
+#start-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 20px rgba(233, 30, 140, 0.45);
+}
+
+#start-btn:active {
+    transform: scale(0.98);
+}
+
+/* ── Cake Screen ── */
+#cake-screen {
+    gap: 0;
+    justify-content: center;
+    padding-bottom: 20px;
+    background: transparent;
+}
+
+.candle-glow {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 220, 180, 0.3) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    pointer-events: none;
+    transition: opacity 1.5s ease;
+    z-index: 0;
+}
+
+.candle-glow.off {
+    opacity: 0;
+}
+
+.blow-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #5c2020;
+    margin-bottom: 1rem;
+    text-align: center;
+    animation: fadeInDown 1s ease 0.5s both;
+    z-index: 2;
+    padding: 0.5rem 1.2rem;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 20px;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+/* ── Cake Scene ── */
+.cake-scene {
+    position: relative;
+    width: 340px;
+    max-width: 85vw;
+    z-index: 2;
+    margin: 0 auto;
+}
+
+.cake-base-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Star Toppers Overlay ── */
+.star-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* ── Candle Slots ── */
+.candle-slot {
+    position: absolute;
+    width: 9%;
+    height: 35%;
+    z-index: 3;
+    transform-origin: bottom center;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.candle-slot .candle-img {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    filter: drop-shadow(0 0 6px rgba(255, 180, 50, 0.5));
+    animation: candleGlow 1.5s ease-in-out infinite alternate;
+    transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.candle-slot.blown .candle-img {
+    opacity: 0;
+    filter: none;
+    animation: none;
+}
+
+/* ── Camera Preview ── */
+.camera-area {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 4;
+    animation: fadeIn 1s ease 1s both;
+}
+
+.camera-bubble {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(233, 30, 140, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: #fff5f8;
+}
+
+.camera-bubble.blowing {
+    border-color: #e91e8c;
+    box-shadow: 0 0 18px rgba(233, 30, 140, 0.5);
+}
+
+.camera-bubble video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+}
+
+.camera-status {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #5c2020;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 2px 10px;
+    border-radius: 10px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* ── Tap to Blow fallback ── */
+#tap-blow-btn {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 0.8rem 2rem;
+    border: 2px solid rgba(233, 30, 140, 0.4);
+    border-radius: 50px;
+    background: rgba(233, 30, 140, 0.15);
+    color: #c2185b;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    z-index: 2;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#tap-blow-btn:hover {
+    background: rgba(233, 30, 140, 0.25);
+}
+
+#tap-blow-btn:active {
+    transform: scale(0.95);
+}
+
+/* ── Note Overlay ── */
+#note-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 240, 245, 0);
+    z-index: 50;
+    transition: background 1s ease;
+    padding: 1.5rem;
+}
+
+#note-overlay.visible {
+    background: rgba(94, 61, 74, 0.4);
+}
+
+.note-card {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(145deg, #fffef9, #fdf6e3);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    color: #3a2f28;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    transform: perspective(800px) rotateX(-90deg) scale(0.8);
+    transform-origin: top center;
+    opacity: 0;
+    transition: transform 1.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.8s ease;
+}
+
+.note-card.open {
+    transform: perspective(800px) rotateX(0deg) scale(1);
+    opacity: 1;
+}
+
+.note-inner {
+    text-align: center;
+}
+
+.note-inner h3 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    color: #c2185b;
+}
+
+.note-message {
+    font-size: 1rem;
+    line-height: 1.8;
+    font-weight: 400;
+    color: #5a4a3f;
+    margin-bottom: 1.5rem;
+}
+
+.note-signature {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.3rem;
+    color: #c2185b;
+}
+
+/* ── Polaroid Overlay ── */
+#polaroid-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0);
+    z-index: 55;
+    transition: background 0.8s ease;
+}
+
+#polaroid-overlay.visible {
+    background: rgba(20, 15, 18, 0.8);
+}
+
+/* ── CSS Polaroid Camera ── */
+.pol-cam {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 57;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.03);
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.pol-cam.fly-in {
+    animation: camFlyIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.pol-cam.fly-out {
+    animation: camFlyOut 0.7s ease-in forwards;
+}
+
+.pol-cam-body {
+    width: 280px;
+    height: 250px;
+    background: linear-gradient(178deg, #f0b8d0 0%, #e094b8 50%, #d480a8 100%);
+    border-radius: 20px 20px 14px 14px;
+    position: relative;
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.35),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+}
+
+.pol-cam-flash-unit {
+    width: 52px;
+    height: 30px;
+    background: linear-gradient(to bottom, #f5d0e0, #e8b0c8);
+    border-radius: 6px 6px 2px 2px;
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pol-cam-flash-bulb {
+    width: 28px;
+    height: 18px;
+    background: linear-gradient(to bottom, #fff5f8, #f0dce4);
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.pol-cam-top {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 14px 30px 0;
+}
+
+.pol-cam-finder {
+    width: 18px;
+    height: 12px;
+    background: #c06080;
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.pol-cam-mid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 24px 10px;
+    position: relative;
+    flex: 1;
+}
+
+.pol-cam-lens {
+    width: 136px;
+    height: 136px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #3a3a3a 0%, #1a1a1a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.pol-cam-lens-ring {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #2a2a2a, #111);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.06);
+}
+
+.pol-cam-viewfinder {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #080808;
+}
+
+.pol-cam-viewfinder video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    border-radius: 50%;
+}
+
+.pol-cam-shutter {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #c2185b, #a01050);
+    position: absolute;
+    right: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.pol-cam-stripe {
+    height: 4px;
+    margin: 0 20px;
+    background: linear-gradient(to right,
+        #c2185b 0%, #c2185b 50%,
+        #f8d8e8 50%, #f8d8e8 100%);
+}
+
+.pol-cam-bottom {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pol-cam-slot {
+    width: 160px;
+    height: 5px;
+    background: rgba(150, 40, 80, 0.15);
+    border-radius: 3px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.pol-cam-text {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    animation: fadeIn 0.4s ease 1.2s forwards;
+}
+
+/* ── Countdown ── */
+.countdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 59;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 6rem;
+    color: #fff;
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.6), 0 4px 20px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    opacity: 0;
+}
+
+.countdown.show {
+    animation: countdownPop 0.8s ease-out forwards;
+}
+
+@keyframes countdownPop {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(2.5); }
+    25%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    80%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
+/* ── Flash ── */
+.polaroid-flash {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    z-index: 58;
+    pointer-events: none;
+}
+
+.polaroid-flash.active {
+    animation: flashBurst 0.7s ease-out forwards;
+}
+
+/* ── Printed Polaroid Photo ── */
+.polaroid-scene {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    z-index: 56;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.polaroid-scene.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.polaroid-frame {
+    background: linear-gradient(165deg, #fefdf5 0%, #f8f3e4 100%);
+    padding: 14px 14px 52px 14px;
+    border-radius: 3px;
+    box-shadow:
+        0 12px 50px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(0, 0, 0, 0.06),
+        inset 0 0 30px rgba(0, 0, 0, 0.02);
+    transform: rotate(-2.5deg);
+    max-width: 300px;
+    width: 75vw;
+}
+
+.polaroid-scene.active .polaroid-frame {
+    animation: polaroidPrint 1.4s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.polaroid-photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #1a1a1a;
+    border-radius: 1px;
+}
+
+.polaroid-photo canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(0, 0, 0, 0.03) 0px,
+            rgba(0, 0, 0, 0.03) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+}
+
+.polaroid-photo .ccd-timestamp {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ff6a00;
+    text-shadow: 0 0 4px rgba(255, 106, 0, 0.6);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+}
+
+.polaroid-caption {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #5c3d4a;
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 0.02em;
+}
+
+/* ── Polaroid Buttons ── */
+.polaroid-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.polaroid-scene.active .polaroid-actions {
+    animation: fadeIn 0.5s ease 1s both;
+}
+
+.polaroid-actions button {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.7rem 1.6rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.02em;
+}
+
+#save-photo-btn {
+    background: #e91e8c;
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(233, 30, 140, 0.4);
+}
+
+#save-photo-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 18px rgba(233, 30, 140, 0.5);
+}
+
+#skip-photo-btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
+}
+
+#skip-photo-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.polaroid-actions button:active {
+    transform: scale(0.96);
+}
+
+/* ── Confetti Canvas ── */
+#confetti-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* ── Keyframes ── */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes candleGlow {
+    0% { filter: drop-shadow(0 0 4px rgba(255, 180, 50, 0.3)); }
+    100% { filter: drop-shadow(0 0 12px rgba(255, 180, 50, 0.8)); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes camFlyIn {
+    0%   { transform: translate(-50%, -50%) scale(0.03); opacity: 0; }
+    15%  { opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@keyframes camFlyOut {
+    0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -80%) scale(0.4); opacity: 0; }
+}
+
+@keyframes flashBurst {
+    0%   { opacity: 0; }
+    8%   { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes polaroidPrint {
+    0%   { transform: rotate(0deg) translateY(-80px) scale(0.85); opacity: 0; }
+    50%  { opacity: 1; }
+    100% { transform: rotate(-2.5deg) translateY(0) scale(1); opacity: 1; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 380px) {
+    .landing-content h1 { font-size: 1.3rem; }
+    .blow-text { font-size: 1.25rem; }
+    .cake-scene { width: 280px; }
+    .note-card { padding: 2rem 1.5rem; }
+    .note-inner h3 { font-size: 1.8rem; }
+    .note-message { font-size: 0.9rem; }
+    .pol-cam-body { width: 230px; height: 210px; }
+    .pol-cam-lens { width: 110px; height: 110px; }
+    .pol-cam-lens-ring { width: 90px; height: 90px; }
+    .pol-cam-viewfinder { width: 76px; height: 76px; }
+    .pol-cam-shutter { width: 32px; height: 32px; right: 20px; }
+}
+
+@media (min-width: 431px) {
+    body {
+        background: #2a2020;
+    }
+    #app {
+        border-radius: 40px;
+        margin-top: max(0px, calc((100vh - 932px) / 2));
+        max-height: 932px;
+        box-shadow: 0 0 0 8px #1a1a1a, 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+}
