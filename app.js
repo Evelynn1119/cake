@@ -387,7 +387,7 @@ class App {
                 $('#camera-bubble').classList.toggle('blowing', active);
             },
             onReady: () => {
-                statusEl.textContent = 'Blow out the candles!';
+                statusEl.textContent = 'Make three wishes, then blow!';
             },
             onError: () => {
                 cameraArea.classList.add('hidden');
@@ -395,7 +395,7 @@ class App {
             },
         });
 
-        statusEl.textContent = 'Loading face detection…';
+        statusEl.textContent = 'Getting ready…';
         const ok = await this.blowDetector.start(video);
 
         if (ok) {
