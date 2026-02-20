@@ -183,30 +183,42 @@ body {
 /* ── Candle Slots ── */
 .candle-slot {
     position: absolute;
-    width: 9%;
-    height: 35%;
+    width: 12%;
+    height: 40%;
     z-index: 3;
     transform-origin: bottom center;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
 }
 
 .candle-slot .candle-img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
     width: 100%;
     height: auto;
-    max-height: 100%;
     object-fit: contain;
     object-position: bottom center;
-    filter: drop-shadow(0 0 6px rgba(255, 180, 50, 0.5));
-    animation: candleGlow 1.5s ease-in-out infinite alternate;
-    transition: opacity 0.5s ease, filter 0.5s ease;
+    transition: opacity 0.4s ease;
 }
 
-.candle-slot.blown .candle-img {
+.candle-slot .candle-img.lit {
+    z-index: 1;
+    filter: drop-shadow(0 0 6px rgba(255, 180, 50, 0.5));
+    animation: candleGlow 1.5s ease-in-out infinite alternate;
+}
+
+.candle-slot .candle-img.unlit {
+    z-index: 0;
+    opacity: 0;
+}
+
+.candle-slot.blown .candle-img.lit {
     opacity: 0;
     filter: none;
     animation: none;
+}
+
+.candle-slot.blown .candle-img.unlit {
+    opacity: 1;
 }
 
 /* ── Camera Preview ── */
